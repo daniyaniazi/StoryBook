@@ -9,26 +9,37 @@ const routes = require('./routes/index')
 const session = require("express-session")
 const MongoDBStore = require('connect-mongodb-session')(session);
 const mongoose = require('mongoose')
+
+
 //locad config 
 dotenv.config({ path: './config/config.env' })
 connectDB()
 
+
 //passport config
 require('./config/passport')(passport)
 
-
 const app = express()
 const PORT = process.env.PORT || 5000
+
+
 //body parser 
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
+
+
 //logging 
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'))
 }
 
+
+//handlebars helpers
+const { formatDate } = require('./helpers/hbs')
+
+
 //Hnadlebars
-app.engine('.hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' }));
+app.engine('.hbs', exphbs({ helpers: { formatDate }, defaultLayout: 'main', extname: '.hbs' }));
 app.set('view engine', '.hbs');
 
 //sessions
@@ -42,12 +53,15 @@ app.use(session({
     //cookie: { secure: true }
 }))
 
+
 //set passport middleware
 app.use(passport.initialize())
 app.use(passport.session())
 
+
 //static folder
 app.use('/', express.static(path.join(__dirname, 'public')))
+
 
 //Routes
 app.use('/', routes);
