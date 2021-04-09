@@ -12,7 +12,7 @@ module.exports = function (passport) {
         async (accessToken, refreshToken, profile, done) => {
             //create new user
             const newUser = {
-                googleID: profile.id,
+                googleId: profile.id,
                 displayName: profile.displayName,
                 firstName: profile.name.givenName,
                 lastName: profile.name.familyName,
@@ -32,14 +32,13 @@ module.exports = function (passport) {
                 console.log(err)
             }
         }))
+    passport.serializeUser((user, done) => {
+        done(null, user.id)
+    })
 
-    passport.serializeUser((id, done) => {
-        done(null, id)
-    })
     passport.deserializeUser((id, done) => {
-        User.findById(id, (err, user) => {
-            done(err, user)
-        })
+        User.findById(id, (err, user) => done(err, user))
     })
+
 
 }
