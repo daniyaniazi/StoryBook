@@ -43,7 +43,7 @@ router.get('/', ensureAuth, async (req, res,) => {
 
 //@desc show edit stories page
 //@route GET /stories/edit
-router.get('/stories/edit/:id', ensureAuth, async (req, res, next) => {
+router.get('/edit/:id', ensureAuth, async (req, res) => {
     const story = await Story.findOne({
         _id: req.params.id
     }).lean()
@@ -64,10 +64,9 @@ router.get('/stories/edit/:id', ensureAuth, async (req, res, next) => {
 })
 
 
-//@desc Update storY
+//@desc Update story
 //@route PUT /stories/:id
-
-router.get('/:id', ensureAuth, async (req, res, next) => {
+router.put('/:id', ensureAuth, async (req, res) => {
     let story = await Story.findById(req.params.id).lean()
 
     if (!story) {

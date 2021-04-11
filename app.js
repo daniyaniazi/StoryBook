@@ -20,37 +20,48 @@ connectDB()
 require('./config/passport')(passport)
 
 const app = express()
-const PORT = process.env.PORT || 5000
+const port = process.env.PORT || 3000
 
 
-//body parser 
+//bodyparser
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
+// Method override
+app.use(
+  methodOverride(function (req, res) {
+    if (req.body && typeof req.body === 'object' && '_method' in req.body) {
+      // look in urlencoded POST bodies and delete it
+      let method = req.body._method
+      delete req.body._method
+      return method
+    }
+  })
+)
 
 //logging 
 if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev'))
+  app.use(morgan('dev'))
 }
 
 
 //handlebars helpers
-const { formatDate, truncate, stripTags, select } = require('./helpers/hbs')
+const { formatDate, truncate, stripTags, select, editIcon } = require('./helpers/hbs')
 
 
 //Hnadlebars
-app.engine('.hbs', exphbs({ helpers: { formatDate, truncate, stripTags, select }, defaultLayout: 'main', extname: '.hbs' }));
+app.engine('.hbs', exphbs({ helpers: { formatDate, truncate, stripTags, select, editIcon }, defaultLayout: 'main', extname: '.hbs' }));
 app.set('view engine', '.hbs');
 
 //sessions
 app.use(session({
-    secret: 'keyboard cat',
-    resave: false,
-    saveUnitialized: false,
-    store: new MongoDBStore({
-        mongooseConnection: mongoose.connection
-    })
-    //cookie: { secure: true }
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: false,
+  store: new MongoDBStore({
+    mongooseConnection: mongoose.connection
+  })
+  //cookie: { secure: true }
 }))
 
 
@@ -60,20 +71,18 @@ app.use(passport.session())
 
 //set global variable
 app.use(function (req, res, next) {
-    res.locals.user = req.user || null
+  res.locals.user = req.user || null
+  next()
 })
 
 //static folder
 app.use('/', express.static(path.join(__dirname, 'public')))
 
+app.use('/', routes)
 
-//Routes
-app.use('/', routes);
 app.use('/auth', require('./routes/auth'));
 app.use('/stories', require('./routes/stories'));
 
-
-//listen
-app.listen(PORT, console.log(
-    `server is running in ${process.env.NODE_ENV} mode on port  ${PORT}`
-))
+app.listen(port, () => {
+  console.log("SERVER STATRED")
+})
