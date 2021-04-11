@@ -10,7 +10,6 @@ const session = require("express-session")
 const MongoDBStore = require('connect-mongodb-session')(session);
 const mongoose = require('mongoose')
 const methodOverride = require('method-override')
-
 //locad config 
 dotenv.config({ path: './config/config.env' })
 connectDB()
@@ -75,8 +74,8 @@ app.use(function (req, res, next) {
   next()
 })
 
-//static folder
-app.use('/', express.static(path.join(__dirname, 'public')))
+// Static folder
+app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/', routes)
 
@@ -84,5 +83,7 @@ app.use('/auth', require('./routes/auth'));
 app.use('/stories', require('./routes/stories'));
 
 app.listen(port, () => {
+
   console.log("SERVER STATRED")
+
 })
