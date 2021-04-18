@@ -2,10 +2,11 @@ const mongoose = require("mongoose")
 
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect('mongodb+srv://admin:admin@Cluster0.22jeh.mongodb.net/storybooks?retryWrites=true&w=majority', {
+        const conn = await mongoose.connect(process.env.MONGO_URI, {
             useNewUrlParser: true,
             useFindAndModify: false,
-            useUnifiedTopology: true
+            useUnifiedTopology: true,
+            useCreateIndex: true,
         })
         console.log(`MongoDB connected ${conn.connection.host}`)
     } catch (err) {
